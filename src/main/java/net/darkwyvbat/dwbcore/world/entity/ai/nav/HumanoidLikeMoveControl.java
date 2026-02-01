@@ -6,8 +6,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
@@ -47,8 +48,14 @@ public class HumanoidLikeMoveControl extends FeaturedMoveControl {
                 }
                 if (climbPos != null) {
                     BlockState climbState = mob.level().getBlockState(climbPos);
-                    if (climbState.getBlock() instanceof LadderBlock)
-                        climbFacing = climbState.getValue(LadderBlock.FACING);
+                    if (climbState.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
+                        climbFacing = climbState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+                    else if (climbState.getBlock() instanceof VineBlock) {
+                        if (climbState.getValue(VineBlock.NORTH)) climbFacing = Direction.SOUTH;
+                        else if (climbState.getValue(VineBlock.SOUTH)) climbFacing = Direction.NORTH;
+                        else if (climbState.getValue(VineBlock.EAST)) climbFacing = Direction.WEST;
+                        else if (climbState.getValue(VineBlock.WEST)) climbFacing = Direction.EAST;
+                    }
                 }
             }
         }
