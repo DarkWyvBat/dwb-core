@@ -23,6 +23,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
@@ -114,5 +116,9 @@ public final class RegistrationHelper {
 
     public static <A extends ProxyBlockAction> ProxyBlockActionType<A> registerPbActionType(Identifier id, ProxyBlockActionType<A> type) {
         return Registry.register(DwbRegistries.PROXY_BLOCK_ACTION_TYPE, id, type);
+    }
+
+    public static <C extends FeatureConfiguration, F extends Feature<C>> F registerFeature(Identifier id, F feature) {
+        return Registry.register(BuiltInRegistries.FEATURE, id, feature);
     }
 }
