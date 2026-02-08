@@ -18,6 +18,7 @@ public class TestProxPools {
     public static final ResourceKey<ProxyBlockPool> CHAIN_A = k("chain_a");
     public static final ResourceKey<ProxyBlockPool> CHAIN_B = k("chain_b");
     public static final ResourceKey<ProxyBlockPool> LOOP = k("loop");
+    public static final ResourceKey<ProxyBlockPool> BLOCK_CONNECT = k("block_connect");
 
     public static void bootstrap(BootstrapContext<ProxyBlockPool> context) {
         context.register(ENTITY, new ProxyBlockPoolBuilder()
@@ -47,6 +48,10 @@ public class TestProxPools {
         );
         context.register(LOOP, new ProxyBlockPoolBuilder()
                 .run(context.lookup(DwbRegistries.PROXY_BLOCK_POOL).getOrThrow(LOOP), 1)
+                .build()
+        );
+        context.register(BLOCK_CONNECT, new ProxyBlockPoolBuilder()
+                .block(Blocks.CHEST, null, true, true, 1)
                 .build()
         );
     }

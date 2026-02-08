@@ -15,9 +15,11 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.TagValueInput;
 
@@ -25,13 +27,15 @@ import java.util.List;
 import java.util.Optional;
 
 public record PlaceBlockAction(BlockState blockState, Optional<CompoundTag> nbt,
-                               boolean copyFacing, List<Identifier> ops) implements ProxyBlockAction {
+                               boolean copyFacing, boolean checkNeighbors,
+                               List<Identifier> ops) implements ProxyBlockAction {
 
     public static final MapCodec<PlaceBlockAction> CODEC = RecordCodecBuilder.mapCodec(i ->
             i.group(
                     BlockState.CODEC.fieldOf("block_state").forGetter(PlaceBlockAction::blockState),
                     TagParser.FLATTENED_CODEC.optionalFieldOf("nbt").forGetter(PlaceBlockAction::nbt),
                     Codec.BOOL.optionalFieldOf("copy_facing", false).forGetter(PlaceBlockAction::copyFacing),
+                    Codec.BOOL.optionalFieldOf("check_neighbors", true).forGetter(PlaceBlockAction::checkNeighbors),
                     Identifier.CODEC.listOf().optionalFieldOf("ops", List.of()).forGetter(PlaceBlockAction::ops)
             ).apply(i, PlaceBlockAction::new)
     );
@@ -42,12 +46,27 @@ public record PlaceBlockAction(BlockState blockState, Optional<CompoundTag> nbt,
         if (depth > MAX_DEPTH) return;
 
         BlockState state = level.getBlockState(pos);
-        BlockState finalState = this.blockState;
-        if (this.copyFacing && state.getBlock() instanceof ProxyBlock) {
+        BlockState finalState = blockState;
+        if (copyFacing && state.getBlock() instanceof ProxyBlock) {
             Direction sourceDirection = state.getValue(ProxyBlock.FACING_PROPERTY);
             Property<?> property = finalState.getBlock().getStateDefinition().getProperty("facing");
             if (property != null && property.getPossibleValues().contains(sourceDirection))
                 finalState = finalState.setValue((Property<Direction>) property, sourceDirection);
+        }
+        if (checkNeighbors) {
+            if (finalState.getBlock() instanceof ChestBlock) {
+                Direction facing = finalState.getValue(ChestBlock.FACING);
+                for (Direction dir : new Direction[]{facing.getClockWise(), facing.getCounterClockWise()}) {
+                    BlockPos neighborPos = pos.relative(dir);
+                    BlockState neighborState = level.getBlockState(neighborPos);
+                    if (neighborState.is(finalState.getBlock()) && neighborState.getValue(ChestBlock.FACING) == facing && neighborState.getValue(ChestBlock.TYPE) == ChestType.SINGLE) {
+                        boolean isRight = (dir == facing.getClockWise());
+                        finalState = finalState.setValue(ChestBlock.TYPE, isRight ? ChestType.LEFT : ChestType.RIGHT);
+                        level.setBlock(neighborPos, neighborState.setValue(ChestBlock.TYPE, isRight ? ChestType.RIGHT : ChestType.LEFT), 3);
+                        break;
+                    }
+                }
+            }
         }
         level.setBlock(pos, finalState, 3);
         nbt.ifPresent(t -> {

@@ -27,12 +27,12 @@ public class DwbCoreModelProvider extends FabricModelProvider {
     }
 
     @Override
-    public void generateBlockStateModels( BlockModelGenerators blockModelGenerators) {
+    public void generateBlockStateModels(BlockModelGenerators blockModelGenerators) {
         registerProxyBlock(blockModelGenerators);
     }
 
     @Override
-    public void generateItemModels( ItemModelGenerators itemModelGenerators) {
+    public void generateItemModels(ItemModelGenerators itemModelGenerators) {
 
     }
 

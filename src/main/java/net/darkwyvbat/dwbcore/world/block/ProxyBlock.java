@@ -45,7 +45,7 @@ public class ProxyBlock extends BaseEntityBlock {
 
     public ProxyBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(EXECUTE_PROPERTY, false).setValue(FACING_PROPERTY, Direction.NORTH).setValue(APPEARANCE_PROPERTY, Appearance.GENERIC));
+        registerDefaultState(stateDefinition.any().setValue(EXECUTE_PROPERTY, false).setValue(FACING_PROPERTY, Direction.NORTH).setValue(APPEARANCE_PROPERTY, Appearance.GENERIC));
     }
 
     @Override
@@ -104,7 +104,8 @@ public class ProxyBlock extends BaseEntityBlock {
         CHEST("chest"),
         DISPENSER("dispenser"),
         MOB("mob"),
-        MONSTER("monster");
+        MONSTER("monster"),
+        EXTENSION("extension");
 
         private final String name;
 

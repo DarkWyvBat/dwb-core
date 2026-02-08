@@ -34,11 +34,12 @@ public class ProxyBlockPoolBuilder {
             pendingAction = new SpawnEntityAction(entityType, nbt, forAdd);
 
         } else if (pendingAction instanceof PlaceBlockAction(
-                BlockState blockState, Optional<CompoundTag> nbt, boolean copyFacing, List<Identifier> ops1
+                BlockState blockState, Optional<CompoundTag> nbt, boolean copyFacing, boolean checkNeighbors,
+                List<Identifier> ops1
         )) {
             List<Identifier> forAdd = new ArrayList<>(ops1);
             forAdd.addAll(ids);
-            pendingAction = new PlaceBlockAction(blockState, nbt, copyFacing, forAdd);
+            pendingAction = new PlaceBlockAction(blockState, nbt, copyFacing, checkNeighbors, forAdd);
         }
         return this;
     }
@@ -55,36 +56,40 @@ public class ProxyBlockPoolBuilder {
     }
 
     public ProxyBlockPoolBuilder block(Block block) {
-        return block(block.defaultBlockState(), null, false, 1);
+        return block(block.defaultBlockState(), null, false, true, 1);
+    }
+
+    public ProxyBlockPoolBuilder block(BlockState state) {
+        return block(state, null, false, true, 1);
     }
 
     public ProxyBlockPoolBuilder block(Block block, int weight) {
-        return block(block.defaultBlockState(), null, false, weight);
+        return block(block.defaultBlockState(), null, false, true, weight);
     }
 
-    public ProxyBlockPoolBuilder block(Block block, String nbt, int weight) {
-        return block(block.defaultBlockState(), nbt, false, weight);
+    public ProxyBlockPoolBuilder block(BlockState state, int weight) {
+        return block(state, null, false, true, weight);
+    }
+
+    public ProxyBlockPoolBuilder block(Block block, boolean copyFacing) {
+        return block(block.defaultBlockState(), null, copyFacing, true, 1);
     }
 
     public ProxyBlockPoolBuilder block(Block block, boolean copyFacing, int weight) {
-        return block(block.defaultBlockState(), null, copyFacing, weight);
+        return block(block.defaultBlockState(), null, copyFacing, true, weight);
     }
 
-    public ProxyBlockPoolBuilder block(Block block, String nbt, boolean copyFacing, int weight) {
-        return block(block.defaultBlockState(), nbt, copyFacing, weight);
+    public ProxyBlockPoolBuilder block(Block block, String nbt, int weight) {
+        return block(block.defaultBlockState(), nbt, false, true, weight);
     }
 
-    public ProxyBlockPoolBuilder block(BlockState blockState, int weight) {
-        return block(blockState, null, false, weight);
+    public ProxyBlockPoolBuilder block(Block block, String nbt, boolean copyFacing, boolean checkNeighbors, int weight) {
+        return block(block.defaultBlockState(), nbt, copyFacing, checkNeighbors, weight);
     }
 
-    public ProxyBlockPoolBuilder block(BlockState blockState, String nbt, int weight) {
-        return block(blockState, nbt, false, weight);
-    }
-
-    public ProxyBlockPoolBuilder block(BlockState blockState, String nbt, boolean copyFacing, int weight) {
+    public ProxyBlockPoolBuilder block(BlockState blockState, String nbt, boolean copyFacing, boolean checkNeighbors, int weight) {
         commit();
-        pendingAction = new PlaceBlockAction(blockState, parseNbt(nbt), copyFacing, List.of());
+        pendingAction = new PlaceBlockAction(blockState, parseNbt(nbt), copyFacing, checkNeighbors, List.of());
         pendingWeight = weight;
         return this;
     }

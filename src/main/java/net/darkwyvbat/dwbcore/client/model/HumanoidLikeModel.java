@@ -5,11 +5,10 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-public class HumanoidLikeModel<S extends HumanoidLikeRenderState> extends HumanoidModel<@NotNull S> {
+public class HumanoidLikeModel<S extends HumanoidLikeRenderState> extends HumanoidModel<S> {
     public HumanoidLikeModel(ModelPart modelPart) {
         super(modelPart);
     }

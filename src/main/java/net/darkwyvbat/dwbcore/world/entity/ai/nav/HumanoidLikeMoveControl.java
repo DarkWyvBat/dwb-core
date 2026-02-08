@@ -1,4 +1,3 @@
-
 package net.darkwyvbat.dwbcore.world.entity.ai.nav;
 
 import net.minecraft.core.BlockPos;
