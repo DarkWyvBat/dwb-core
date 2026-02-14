@@ -44,6 +44,10 @@ public class ProxyBlockPoolBuilder {
         return this;
     }
 
+    public ProxyBlockPoolBuilder entity(EntityType<?> entity) {
+        return entity(entity, 1);
+    }
+
     public ProxyBlockPoolBuilder entity(EntityType<?> entity, int weight) {
         return entity(entity, null, weight);
     }
