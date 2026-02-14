@@ -19,6 +19,6 @@ public class PerceptionProfile {
     }
 
     public void addDangerLevel(int amt) {
-        dangerLevel = (int) Mth.clamp((long) dangerLevel + amt, 0, Integer.MAX_VALUE);
+        dangerLevel = Math.clamp((long) dangerLevel + amt, 0, Integer.MAX_VALUE);
     }
 }

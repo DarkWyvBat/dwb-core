@@ -1,6 +1,6 @@
 package net.darkwyvbat.dwbcore.world.entity.ai.combat;
 
-import net.darkwyvbat.dwbcore.util.MathUtils;
+import net.darkwyvbat.dwbcore.util.MathU;
 import net.darkwyvbat.dwbcore.world.entity.AbstractHumanoidEntity;
 import net.darkwyvbat.dwbcore.world.entity.EntityUtils;
 import net.darkwyvbat.dwbcore.world.entity.specs.RangedAttacker;
@@ -42,7 +42,7 @@ public final class WeaponCombatUsage {
                     state.startRangedCooldown(state.config().rangedConfig().cd());
                 }
             } else if (state.isRangedCooldownReady() && state.canSeeTarget() && state.getSeeTime() >= 0)
-                if (MathUtils.isBtwn(state.distanceSqr(), state.config().rangedConfig().startDistSqr(), state.config().rangedConfig().maxRangeSqr()))
+                if (MathU.isBtwn(state.distanceSqr(), state.config().rangedConfig().startDistSqr(), state.config().rangedConfig().maxRangeSqr()))
                     mob.startUsingItem(hand);
         });
 

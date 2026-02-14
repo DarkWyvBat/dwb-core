@@ -90,7 +90,7 @@ public class HumanoidLikeMoveControl extends FeaturedMoveControl {
         }
         double dX = tX - mob.getX();
         double dZ = tZ - mob.getZ();
-        mob.move(MoverType.SELF, new Vec3(Mth.clamp(dX * CENTER, -MAX_HORIZ, MAX_HORIZ), dY, Mth.clamp(dZ * CENTER, -MAX_HORIZ, MAX_HORIZ)));
+        mob.move(MoverType.SELF, new Vec3(Math.clamp(dX * CENTER, -MAX_HORIZ, MAX_HORIZ), dY, Math.clamp(dZ * CENTER, -MAX_HORIZ, MAX_HORIZ)));
     }
 
     private float getTargetYaw() {

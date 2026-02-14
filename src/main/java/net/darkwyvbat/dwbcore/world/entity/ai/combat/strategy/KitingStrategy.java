@@ -1,6 +1,6 @@
 package net.darkwyvbat.dwbcore.world.entity.ai.combat.strategy;
 
-import net.darkwyvbat.dwbcore.util.MathUtils;
+import net.darkwyvbat.dwbcore.util.MathU;
 import net.darkwyvbat.dwbcore.world.entity.ai.combat.CombatState;
 import net.darkwyvbat.dwbcore.world.entity.ai.combat.CombatStateView;
 import net.darkwyvbat.dwbcore.world.entity.ai.combat.CombatStrategy;
@@ -50,6 +50,6 @@ public class KitingStrategy extends CombatStrategy {
 
     @Override
     public boolean canStart(CombatStateView state, CombatStrategy currentStrategy) {
-        return rangedAttacker.hasRanged() && state.canSeeTarget() && MathUtils.isBtwn(state.distanceSqr(), state.config().rangedConfig().startDistSqr(), state.config().rangedConfig().startKitingDistSqr());
+        return rangedAttacker.hasRanged() && state.canSeeTarget() && MathU.isBtwn(state.distanceSqr(), state.config().rangedConfig().startDistSqr(), state.config().rangedConfig().startKitingDistSqr());
     }
 }

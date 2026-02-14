@@ -64,7 +64,7 @@ public class FeaturedMoveControl extends MoveControl {
         if (mob.tickCount % 8 == 0 && mob.getNavigation().getPath() != null && mob.getNavigation().getPath().getNextNode().y > mob.getY() && !mob.isEyeInFluid(FluidTags.WATER))
             mob.getJumpControl().jump();
 
-        float rawPitch = Mth.clamp((float) (Mth.atan2(-dY, distH) * Mth.RAD_TO_DEG), -85.0F, 85.0F);
+        float rawPitch = Math.clamp((float) (Mth.atan2(-dY, distH) * Mth.RAD_TO_DEG), -85.0F, 85.0F);
         if (Math.abs(Mth.degreesDifference(mob.getXRot(), rawPitch)) > 1.0F)
             mob.setXRot(rotlerp(mob.getXRot(), rawPitch, MAX_PITCH_WATER));
 

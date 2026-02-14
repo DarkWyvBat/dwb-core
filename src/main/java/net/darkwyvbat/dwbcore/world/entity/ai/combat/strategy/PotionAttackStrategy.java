@@ -1,6 +1,6 @@
 package net.darkwyvbat.dwbcore.world.entity.ai.combat.strategy;
 
-import net.darkwyvbat.dwbcore.util.MathUtils;
+import net.darkwyvbat.dwbcore.util.MathU;
 import net.darkwyvbat.dwbcore.util.time.TimestampCooldown;
 import net.darkwyvbat.dwbcore.world.entity.ai.AIUtils;
 import net.darkwyvbat.dwbcore.world.entity.ai.combat.CombatState;
@@ -32,7 +32,7 @@ public class PotionAttackStrategy extends CombatStrategy {
 
     @Override
     public boolean canStart(CombatStateView state, CombatStrategy currentStrategy) {
-        if (cd.isReady(state.timeNow()) && potionAttacker.hasAttackPotions() && MathUtils.isBtwn(state.distanceSqr(), 25.0, 144.0)) {
+        if (cd.isReady(state.timeNow()) && potionAttacker.hasAttackPotions() && MathU.isBtwn(state.distanceSqr(), 25.0, 144.0)) {
             effect = AIUtils.getSuitableAttackPotion(state.attacker(), state.target(), potionAttacker.getAvailableAttackEffects());
             return effect != null;
         }
