@@ -11,14 +11,14 @@ import net.minecraft.world.level.block.Blocks;
 import static net.darkwyvbat.dwbcore.DwbCore.INFO;
 
 public class TestProxPools {
-    public static final ResourceKey<ProxyBlockPool> ENTITY = k("entity");
-    public static final ResourceKey<ProxyBlockPool> BLOCK = k("block");
-    public static final ResourceKey<ProxyBlockPool> FACING = k("facing");
-    public static final ResourceKey<ProxyBlockPool> RANDOM = k("random");
-    public static final ResourceKey<ProxyBlockPool> CHAIN_A = k("chain_a");
-    public static final ResourceKey<ProxyBlockPool> CHAIN_B = k("chain_b");
-    public static final ResourceKey<ProxyBlockPool> LOOP = k("loop");
-    public static final ResourceKey<ProxyBlockPool> BLOCK_CONNECT = k("block_connect");
+    public static final ResourceKey<ProxyBlockPool> ENTITY = key("entity");
+    public static final ResourceKey<ProxyBlockPool> BLOCK = key("block");
+    public static final ResourceKey<ProxyBlockPool> FACING = key("facing");
+    public static final ResourceKey<ProxyBlockPool> RANDOM = key("random");
+    public static final ResourceKey<ProxyBlockPool> CHAIN_A = key("chain_a");
+    public static final ResourceKey<ProxyBlockPool> CHAIN_B = key("chain_b");
+    public static final ResourceKey<ProxyBlockPool> LOOP = key("loop");
+    public static final ResourceKey<ProxyBlockPool> BLOCK_CONNECT = key("block_connect");
 
     public static void bootstrap(BootstrapContext<ProxyBlockPool> context) {
         context.register(ENTITY, new ProxyBlockPoolBuilder()
@@ -56,7 +56,7 @@ public class TestProxPools {
         );
     }
 
-    private static ResourceKey<ProxyBlockPool> k(String i) {
+    private static ResourceKey<ProxyBlockPool> key(String i) {
         return ResourceKey.create(DwbRegistries.PROXY_BLOCK_POOL, INFO.id(i));
     }
 }

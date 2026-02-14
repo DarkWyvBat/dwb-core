@@ -15,10 +15,10 @@ public interface ChronologicalEntity<T extends ChronologicalEntity<T>> {
     }
 
     default void saveChronology(ValueOutput valueOutput) {
-        valueOutput.putInt("chronological_time", getTimeline().getTime());
+        valueOutput.putLong("chronological_time", getTimeline().getTime());
     }
 
     default void loadChronology(ValueInput valueInput) {
-        getTimeline().setTime(valueInput.getInt("chronological_time").orElse(0));
+        getTimeline().setTime(valueInput.getLong("chronological_time").orElse(0L));
     }
 }

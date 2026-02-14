@@ -9,7 +9,7 @@ public class Timeline<T> {
     private final T object;
     private final List<TimelineEvent<T>> events = new ArrayList<>();
 
-    private int time = 0;
+    private long time = 0;
     private int nextEventIndex = 0;
 
     public Timeline(T object) {
@@ -27,10 +27,10 @@ public class Timeline<T> {
     public void tick() {
         ++time;
         while (nextEventIndex < events.size() && time >= events.get(nextEventIndex).triggerTime())
-            events.get(nextEventIndex++).action().accept(this.object);
+            events.get(nextEventIndex++).action().accept(object);
     }
 
-    public void setTime(int time) {
+    public void setTime(long time) {
         this.time = time;
         int newNextIndex = 0;
         for (TimelineEvent<T> event : events)
@@ -39,7 +39,7 @@ public class Timeline<T> {
         this.nextEventIndex = newNextIndex;
     }
 
-    public int getTime() {
+    public long getTime() {
         return time;
     }
 }
