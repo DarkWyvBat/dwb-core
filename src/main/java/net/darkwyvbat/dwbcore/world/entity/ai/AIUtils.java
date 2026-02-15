@@ -4,7 +4,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.Set;
 
@@ -23,13 +22,6 @@ public final class AIUtils {
             return MobEffects.INSTANT_DAMAGE;
 
         return null;
-    }
-
-    public static boolean isValidTarget(LivingEntity entity) {
-        if (entity == null || !entity.isAlive()) return false;
-        if (entity instanceof Player player && (player.isCreative() || player.isSpectator())) return false;
-
-        return true;
     }
 
 }

@@ -2,7 +2,7 @@ package net.darkwyvbat.dwbcore.world.entity.ai.goal;
 
 import net.darkwyvbat.dwbcore.world.entity.AbstractHumanoidEntity;
 import net.darkwyvbat.dwbcore.world.entity.AbstractInventoryHumanoid;
-import net.darkwyvbat.dwbcore.world.entity.ai.AIUtils;
+import net.darkwyvbat.dwbcore.world.entity.EntityUtils;
 import net.darkwyvbat.dwbcore.world.entity.ai.combat.CombatConfig;
 import net.darkwyvbat.dwbcore.world.entity.ai.combat.CombatState;
 import net.darkwyvbat.dwbcore.world.entity.ai.combat.CombatStrategyManager;
@@ -28,7 +28,7 @@ public class HumanoidCombatGoal extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity target = mob.getTarget();
-        if (!AIUtils.isValidTarget(target) || (mob.getAirSupply() < 10 && !mob.canBreatheUnderwater()) || !mob.canSelfMove())
+        if (!EntityUtils.isValidTarget(target) || (mob.getAirSupply() < 10 && !mob.canBreatheUnderwater()) || !mob.canSelfMove())
             return false;
         this.target = target;
         return true;
@@ -37,7 +37,7 @@ public class HumanoidCombatGoal extends Goal {
     @Override
     public boolean canContinueToUse() {
         LivingEntity target = mob.getTarget();
-        if (!AIUtils.isValidTarget(target)) return false;
+        if (!EntityUtils.isValidTarget(target)) return false;
         return this.target == target && (mob.getAirSupply() >= 5 || mob.canBreatheUnderwater());
     }
 
@@ -65,7 +65,7 @@ public class HumanoidCombatGoal extends Goal {
     @Override
     public void tick() {
         target = mob.getTarget();
-        if (!AIUtils.isValidTarget(target)) return;
+        if (!EntityUtils.isValidTarget(target)) return;
         mob.getLookControl().setLookAt(target);
 
         updateCombatState();
