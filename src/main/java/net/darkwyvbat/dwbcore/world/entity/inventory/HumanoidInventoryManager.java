@@ -79,7 +79,11 @@ public class HumanoidInventoryManager extends InventoryManager {
         potionEffectCache.clear();
     }
 
-    public Map<EquipmentSlot, Integer> getEquipmentSlotsInvRefs() {
+    public Map<EquipmentSlot, Integer> getEquipmentSlotInvRefs() {
         return equipmentSlotsInvRefs;
+    }
+
+    public void setSlotRefs(Map<EquipmentSlot, Integer> refs) {
+        equipmentSlotsInvRefs.putAll(refs);
     }
 }

@@ -43,11 +43,13 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
     protected abstract MobInventoryProfile getInventoryProfile();
 
     protected void populateInventory() {
+        System.out.println("populated");
         inventoryManager.addItems(getInventoryProfile().items().stream().map(ItemStackTemplate::create).toList());
     }
 
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, EntitySpawnReason entitySpawnReason, @Nullable SpawnGroupData spawnGroupData) {
-        populateInventory();
+        System.out.println("finalize");
+        if (entitySpawnReason != EntitySpawnReason.CONVERSION) populateInventory();
         inventoryManager.updateInventoryEntries();
         return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, entitySpawnReason, spawnGroupData);
     }
@@ -59,6 +61,15 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
             scanForItems();
 
         useItemCd.tick();
+    }
+
+    public <T extends Mob> T convertToMob(EntityType<T> entityType, ConversionParams params, boolean keepInventory) {
+        return convertTo(entityType, params, m -> {
+            if (keepInventory && m instanceof InventoryUser inventoryUser) {
+                inventoryUser.getInventoryManager().addItems(getInventory().getItems());
+                ((HumanoidInventoryManager) inventoryUser.getInventoryManager()).setSlotRefs(inventoryManager.getEquipmentSlotInvRefs());
+            }
+        });
     }
 
     @Override
@@ -206,7 +217,7 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
     protected void completeUsingItem() {
         InteractionHand hand = getUsedItemHand();
         EquipmentSlot slot = hand.asEquipmentSlot();
-        int invIndex = inventoryManager.getEquipmentSlotsInvRefs().get(slot);
+        int invIndex = inventoryManager.getEquipmentSlotInvRefs().get(slot);
         super.completeUsingItem();
         if (invIndex != -1)
             getInventory().setItem(invIndex, getItemInHand(hand));
@@ -215,11 +226,11 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
     }
 
     public int equipFromInventory(EquipmentSlot targetSlot, int newInvIndex) {
-        Integer oldInvIndex = inventoryManager.getEquipmentSlotsInvRefs().get(targetSlot);
+        Integer oldInvIndex = inventoryManager.getEquipmentSlotInvRefs().get(targetSlot);
         if (oldInvIndex.equals(newInvIndex)) return oldInvIndex;
         ItemStack item = newInvIndex != InventoryManager.INVALID_INDEX ? getInventory().getItem(newInvIndex) : ItemStack.EMPTY;
         setItemSlot(targetSlot, item);
-        inventoryManager.getEquipmentSlotsInvRefs().put(targetSlot, newInvIndex);
+        inventoryManager.getEquipmentSlotInvRefs().put(targetSlot, newInvIndex);
         return newInvIndex;
     }
 
