@@ -35,6 +35,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec2;
 
 public class HumanoidTester extends CombatantInventoryHumanoid implements GrowableMob<HumanoidTester> {
 
@@ -104,8 +105,8 @@ public class HumanoidTester extends CombatantInventoryHumanoid implements Growab
     }
 
     @Override
-    protected float getDimScale() {
-        return isBaby() ? 0.5F : super.getDimScale();
+    protected Vec2 getDimModifier() {
+        return isBaby() ? new Vec2(0.5F, 0.5F) : super.getDimModifier();
     }
 
     @Override

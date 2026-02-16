@@ -54,6 +54,7 @@ public final class EntityUtils {
     }
 
     public static void angerNearbyMobs(ServerLevel level, LivingEntity target, double r, boolean see, long ticks, Predicate<Mob> predicate) {
+        if (!isValidTarget(target)) return;
         List<Mob> mobs = level.getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate(r), m -> m != target && m.isAlive() && predicate.test(m));
         for (Mob mob : mobs) {
             if (see && !mob.getSensing().hasLineOfSight(target)) continue;

@@ -25,6 +25,7 @@ import net.minecraft.world.item.component.BlocksAttacks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import static net.darkwyvbat.dwbcore.DwbCore.INFO;
@@ -307,8 +308,8 @@ public abstract class AbstractHumanoidEntity extends PerceptionBasedMob implemen
         return 1.0F;
     }
 
-    protected float getDimScale() {
-        return 1.0F;
+    protected Vec2 getDimModifier() {
+        return null;
     }
 
     @Override
@@ -321,7 +322,8 @@ public abstract class AbstractHumanoidEntity extends PerceptionBasedMob implemen
             case DYING -> DYING_DIMENSIONS;
             default -> STANDING_DIMENSIONS;
         };
-        EntityDimensions scaled = dimension.scale(getDimScale());
+        Vec2 dimScale = getDimModifier();
+        EntityDimensions scaled = (dimScale != null) ? dimension.scale(dimScale.x, dimScale.y) : dimension;
         return scaled.withEyeHeight(scaled.eyeHeight() * getEyeHeightModifier());
     }
 
