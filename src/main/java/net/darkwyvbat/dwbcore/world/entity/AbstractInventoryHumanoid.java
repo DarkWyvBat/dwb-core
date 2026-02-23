@@ -43,12 +43,10 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
     protected abstract MobInventoryProfile getInventoryProfile();
 
     protected void populateInventory() {
-        System.out.println("populated");
         inventoryManager.addItems(getInventoryProfile().items().stream().map(ItemStackTemplate::create).toList());
     }
 
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, EntitySpawnReason entitySpawnReason, @Nullable SpawnGroupData spawnGroupData) {
-        System.out.println("finalize");
         if (entitySpawnReason != EntitySpawnReason.CONVERSION) populateInventory();
         inventoryManager.updateInventoryEntries();
         return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, entitySpawnReason, spawnGroupData);
@@ -126,11 +124,15 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
         inventoryManager.updateInventoryEntries();
     }
 
-    private void scanForItems() {
+    protected double itemsScanDistance() {
+        return 10.0;
+    }
+
+    protected void scanForItems() {
         if (wantedItem != null && wantedItem.isAlive() && !wantedItem.hasPickUpDelay()) return;
         wantedItem = null;
 
-        List<ItemEntity> itemsAround = getItemsAround(8);
+        List<ItemEntity> itemsAround = getItemsAround(itemsScanDistance());
         if (itemsAround.isEmpty()) return;
         ItemEntity closestItem = null;
         double minDistSqr = Double.MAX_VALUE;
@@ -153,24 +155,16 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
     public boolean wantsToPickUp(ServerLevel serverLevel, ItemStack itemStack) {
         if (itemStack.isEmpty()) return false;
 
-        Set<ItemCategory> categories = inventoryManager.getCategorizer().categorize(itemStack);
-        if (categories.isEmpty()) return false;
         ItemCategory newCategory = null;
-        for (ItemCategory cat : categories)
-            if (newCategory == null || inventoryManager.isCategoryMoreImportant(cat, newCategory))
+        for (ItemCategory cat : inventoryManager.getCategorizer().categorize(itemStack)) {
+            ItemInspector inspector = getInventoryProfile().itemInspectors().get(cat);
+            if ((!inventoryManager.entryNotEmpty(cat) || inspector == null || inspector.isWanted(this, itemStack, cat, inventoryManager)) && (newCategory == null || inventoryManager.isCategoryMoreImportant(cat, newCategory)))
                 newCategory = cat;
-        if (inventoryManager.entryNotEmpty(newCategory)) {
-            ItemInspector inspector = getInventoryProfile().itemInspectors().get(newCategory);
-            if (inspector != null)
-                if (!inspector.isWanted(this, itemStack, newCategory, inventoryManager))
-                    return false;
         }
+        if (newCategory == null) return false;
         if (getInventory().canAddItem(itemStack)) return true;
         ItemCategory lowestInInv = inventoryManager.getLowestPresentCategory();
-        if (lowestInInv == null) return true;
-        if (inventoryManager.isCategoryMoreImportant(newCategory, lowestInInv))
-            return true;
-        return newCategory == lowestInInv;
+        return lowestInInv == null || newCategory == lowestInInv || inventoryManager.isCategoryMoreImportant(newCategory, lowestInInv);
     }
 
     protected List<ItemEntity> getItemsAround(double r) {
@@ -181,23 +175,23 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
     public void cleanInventory(int slotsToFree) {
         Set<Integer> trashIndices = inventoryManager.getPotentialTrash(slotsToFree, getInventoryProfile().inventoryConfig().cleanStrategies());
         throwItems(trashIndices, null, 1.0F, 40);
-        trashIndices.forEach(i -> inventoryManager.getInventory().removeItem(i, inventoryManager.getInventory().getItem(i).getCount()));
+        trashIndices.forEach(i -> getInventory().removeItem(i, getInventory().getItem(i).getCount()));
     }
 
     public void throwItem(int i, int c, Vec3 dest, float f, int delay, boolean shouldUpdate) {
         swing(InteractionHand.MAIN_HAND);
         Vec3 dir = dest == null ? Vec3.directionFromRotation(getRotationVector()).scale(f) : dest.normalize().scale(f);
-        spawnThrownItem(inventoryManager.getInventory().getItem(i), dir, f, delay);
-        if (shouldUpdate) inventoryManager.getInventory().removeItem(i, c);
-        else inventoryManager.getInventory().removeItemNoUpdate(i);
+        spawnThrownItem(getInventory().getItem(i), dir, f, delay);
+        if (shouldUpdate) getInventory().removeItem(i, c);
+        else getInventory().removeItemNoUpdate(i);
     }
 
     public void throwItems(Set<Integer> items, Vec3 dest, float f, int delay) {
         swing(InteractionHand.MAIN_HAND);
         for (int i : items)
-            throwItem(i, inventoryManager.getInventory().getItem(i).getCount(), dest, 0.3F, delay, false);
+            throwItem(i, getInventory().getItem(i).getCount(), dest, 0.3F, delay, false);
 
-        inventoryManager.getInventory().setChanged();
+        getInventory().setChanged();
     }
 
     public void prepareArmor() {
@@ -259,11 +253,31 @@ public abstract class AbstractInventoryHumanoid extends AbstractHumanoidEntity i
     }
 
     @Override
-    protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource damageSource, boolean bl) {
-        inventoryManager.getInventory().removeAllItems().forEach(itemStack -> {
-            if (!EnchantmentHelper.has(itemStack, EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP))
-                spawnAtLocation(serverLevel, itemStack);
-        });
+    protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean killedByPlayer) {
+        List<ItemStack> dropItems = getInventory().removeAllItems();
+        float chance = inventoryDropChance(), quality = inventoryDropQuality();
+        for (ItemStack itemStack : dropItems) {
+            if (itemStack.isEmpty()) continue;
+            if (EnchantmentHelper.has(itemStack, EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) continue;
+            if (source.getEntity() instanceof LivingEntity livingEntity)
+                chance = EnchantmentHelper.processEquipmentDropChance(level, livingEntity, source, chance);
+            if (killedByPlayer && getRandom().nextFloat() <= chance) {
+                if (itemStack.isDamageableItem() && quality < 1.0F) {
+                    int maxDamage = itemStack.getMaxDamage();
+                    //itemStack.setDamageValue(itemStack.getMaxDamage() - this.random.nextInt(1 + this.random.nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))));
+                    itemStack.setDamageValue((int) ((maxDamage - getRandom().nextInt(1 + getRandom().nextInt(Math.max(maxDamage - 3, 1)))) * (1.0F - quality)));
+                }
+                spawnAtLocation(level, itemStack);
+            }
+        }
+    }
+
+    protected float inventoryDropChance() {
+        return 0.05F;
+    }
+
+    protected float inventoryDropQuality() {
+        return 0.1F;
     }
 
     public ItemEntity getWantedItem() {

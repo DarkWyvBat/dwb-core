@@ -296,11 +296,15 @@ public abstract class AbstractHumanoidEntity extends PerceptionBasedMob implemen
         return super.applyItemBlocking(serverLevel, damageSource, f);
     }
 
+    protected float useItemMovSpeedMult() {
+        return 0.4F;
+    }
+
     @Override
     public float getSpeed() {
         double speed = getAttributeValue(Attributes.MOVEMENT_SPEED);
         if (isCrouching()) speed *= getAttributeValue(Attributes.SNEAKING_SPEED);
-        if (isUsingItem()) speed *= 0.5;
+        if (isUsingItem()) speed *= useItemMovSpeedMult();
         return (float) speed;
     }
 

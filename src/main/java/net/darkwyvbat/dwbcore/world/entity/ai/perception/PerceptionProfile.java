@@ -2,7 +2,6 @@ package net.darkwyvbat.dwbcore.world.entity.ai.perception;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.util.Mth;
 
 //TODO
 public class PerceptionProfile {

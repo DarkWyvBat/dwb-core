@@ -17,8 +17,8 @@ public class OpinionResolver {
     }
 
     public void addOpinion(Class<? extends Entity> entityClass, Opinion opinion) {
-        this.baseOpinions.put(entityClass, opinion);
-        this.cache.clear();
+        baseOpinions.put(entityClass, opinion);
+        cache.clear();
     }
 
     public Opinion get(Class<? extends Entity> entityClass) {
